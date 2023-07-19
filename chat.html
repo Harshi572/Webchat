@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat</title>
+    <style>
+        #chatbox {
+            height: 300px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="chatbox"></div>
+    <input type="text" id="message" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        // Create a WebSocket connection
+        const socket = new WebSocket("ws://localhost:8080");
+
+        // Handle messages received from the server
+        socket.onmessage = function (event) {
+            const message = JSON.parse(event.data);
+            displayMessage(message);
+        };
+
+        // Send a message to the server
+        function sendMessage() {
+            const messageInput = document.getElementById("message");
+            const message = {
+                content: messageInput.value,
+                timestamp: new Date().toISOString()
+            };
+            socket.send(JSON.stringify(message));
+            messageInput.value = "";
+        }
+
+        // Display a message in the chatbox
+        function displayMessage(message) {
+            const chatbox = document.getElementById("chatbox");
+            const messageElement = document.createElement("div");
+            messageElement.innerHTML = `${message.timestamp}: ${message.content}`;
+            chatbox.appendChild(messageElement);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
